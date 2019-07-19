@@ -1,0 +1,6 @@
+---
+- name: elasticsearch
+  hosts: elasticsearch
+  remote_user: root
+  roles:
+    - elasticsearch

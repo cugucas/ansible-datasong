@@ -1,0 +1,24 @@
+[ssh]
+node01 ansible_host=172.16.10.70
+node02 ansible_host=172.16.10.71
+node03 ansible_host=172.16.10.72
+
+[hostname]
+node01 ansible_host=172.16.10.70
+node02 ansible_host=172.16.10.71
+node03 ansible_host=172.16.10.72
+
+[jdk]
+node01 ansible_host=172.16.10.70
+node02 ansible_host=172.16.10.71
+node03 ansible_host=172.16.10.72
+
+[elasticsearch]
+node01 ansible_host=172.16.10.70 node_num=1 jvm_heap=2g
+node02 ansible_host=172.16.10.71 node_num=1 jvm_heap=2g
+node03 ansible_host=172.16.10.72 node_num=1 jvm_heap=2g
+
+[hbase]
+node01 ansible_host=172.16.10.70
+node02 ansible_host=172.16.10.71
+node03 ansible_host=172.16.10.72

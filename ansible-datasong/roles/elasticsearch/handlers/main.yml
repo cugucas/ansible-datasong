@@ -1,0 +1,11 @@
+---
+
+- name: restart elasticsearch
+  shell: |
+    su - {{ elasticsearch_user }}
+    jps | grep Elasticsearch | awk '{print $1}' | xargs kill -9 
+    "{{ elasticsearch_home }}/bin/elasticsearch -d"
+
+    #su - {{ elasticsearch_user }} -c 'kill -9 `jps | grep "Elasticsearch" | cut -d " " -f 1`'
+    #su - {{ elasticsearch_user }} -c '{{ elasticsearch_home }}/bin/elasticsearch -d'
+    

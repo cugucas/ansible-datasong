@@ -1,0 +1,31 @@
+---
+
+   - name: mkdir jdk directory  
+     file: 
+       path: "{{jdk_install_path}}"
+       state: directory
+       mode: 0755
+
+   - name: copy and unzip jdk 
+     unarchive: 
+       src: "{{jdk_file}}"
+       dest: "{{jdk_install_path}}"
+
+   - name: set env 
+     lineinfile: 
+       dest: /etc/profile 
+       insertafter: "{{item.position}}" 
+       line: "{{item.value}}"
+       state: present
+     with_items:
+     - {position: EOF, value: "export JAVA_HOME={{ jdk_install_path }}/{{ jdk_install_folder }}"}
+     - {position: EOF, value: "export PATH=$JAVA_HOME/bin:$PATH"}
+
+   - name: chmod bin  
+     file: 
+       dest: "{{ jdk_install_path }}/{{ jdk_install_folder }}/bin"
+       mode: 0755
+       recurse: yes
+       
+   - name: enforce env  
+     shell: source /etc/profile
