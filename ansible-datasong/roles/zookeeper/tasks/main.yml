@@ -1,0 +1,29 @@
+---
+
+- name: mkdir for zookeeper home
+  file: 
+    dest: "{{ zookeeper_home }}"
+    mode: 0755
+    state: directory
+    owner: "{{ zookeeper_user }}" 
+    group: "{{ zookeeper_group }}"
+    
+- name: copy and unzip zookeeper.tar.gz to hosts
+  unarchive: 
+      src: "{{ zookeeper_tarball }}"
+      dest: "{{ zookeeper_install_path }}"
+
+- name: modify zookeeper configuration 
+  template: 
+    src: "zoo.cfg.j2"
+    dest: "{{ zookeeper_home }}/conf/zoo.cfg"
+  notify: 
+      - restart zookeeper
+  tags: zookeeper_conf
+
+- name: install myid
+  template: 
+    src: myid.j2 
+    dest: "{{ zookeeper_data_dir }}/myid"
+  when: groups['zookeepernodes']|count > 1 and destroy_data
+  tags: init

@@ -1,0 +1,7 @@
+{% if groups['zookeeper']|count > 1 %}
+{% for item in groups['zookeeper'] %}
+{% if ansible_hostname == item %}
+{{ loop.index }}
+{% endif %}
+{% endfor %}
+{% endif %}

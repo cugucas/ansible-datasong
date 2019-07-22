@@ -1,0 +1,27 @@
+---
+
+  - name: configure HBase 
+    template: 
+      src: "{{ item }}"
+      dest: "{{ hbase_home }}/conf/{{ item }}"
+      owner: root
+      group: root
+      mode: 0644
+    with_items:
+      - hbase-env.sh
+      - hbase-site.xml
+      - regionservers
+    notify:
+      - restart hbase-master
+      - restart hbase-regionserver
+    tags:
+      - hbase
+      - configuration
+
+  - name: start namenode
+    shell: sh {{ hbase_home }}/bin/start-hbase.sh
+    become: true
+    become_method: su
+    become_user: root
+    tags:
+      - start hadoop

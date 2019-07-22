@@ -13,12 +13,26 @@ node01 ansible_host=172.16.10.70
 node02 ansible_host=172.16.10.71
 node03 ansible_host=172.16.10.72
 
-[elasticsearch]
+[elasticsearch] 
 node01 ansible_host=172.16.10.70 node_num=1 jvm_heap=2g
 node02 ansible_host=172.16.10.71 node_num=1 jvm_heap=2g
 node03 ansible_host=172.16.10.72 node_num=1 jvm_heap=2g
 
-[hbase]
+[hbase-master]
+node01 ansible_host=172.16.10.70
+
+[hbase-regionserver]
+node02 ansible_host=172.16.10.71
+node03 ansible_host=172.16.10.72
+
+[hdfs-namenode]
+node01 ansible_host=172.16.10.70
+
+[hdfs-datanode]
+node02 ansible_host=172.16.10.71
+node03 ansible_host=172.16.10.72
+
+[zookeeper]
 node01 ansible_host=172.16.10.70
 node02 ansible_host=172.16.10.71
 node03 ansible_host=172.16.10.72
