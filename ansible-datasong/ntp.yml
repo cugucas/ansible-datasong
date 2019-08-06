@@ -1,0 +1,6 @@
+---
+- name: configure ntp
+  hosts: ntp
+  remote_user: root
+  roles:
+    - ntp

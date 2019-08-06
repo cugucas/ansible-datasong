@@ -1,0 +1,64 @@
+---
+
+  - name: set timezone to Asia/Shanghai
+    shell: timedatectl set-timezone Asia/Shanghai
+
+  - name: mkdir for ntp home
+    file: 
+      dest: "{{ ntp_install_path }}"
+      mode: 0755
+      state: directory
+      owner: "{{ ntp_user }}" 
+      group: "{{ ntp_group }}"
+
+  - name: copy ntp rpms
+    copy:
+      src: "{{ item }}"
+      dest: "{{ ntp_install_path }}"
+      owner: root
+      mode: 777
+    with_fileglob:
+      - files/*
+
+  - name: get all ntp rpms 
+    find:
+      paths: "{{ ntp_install_path }}"
+      patterns: "*.rpm"
+    register: ntp_rpms
+  
+  - name: install ntp rpms
+    yum:
+      name: "{{ item.path }}"
+      state: present
+    with_items: "{{ ntp_rpms.files }}"
+
+  - name: modify ntp configuration 
+    template: 
+      src: "ntp.conf.server.j2"
+      dest: "/etc/ntp.conf"
+    when: ansible_hostname in groups['ntp-server']
+    tags: ntp
+
+  - name: modify ntp configuration 
+    template: 
+      src: "ntp.conf.client.j2"
+      dest: "/etc/ntp.conf"
+    when: ansible_hostname in groups['ntp-clients']
+    tags: ntp
+
+  - name: restart ntp service
+    shell: 
+      systemctl restart ntpd
+    when: ansible_hostname in groups['ntp-server']
+
+  - name: clients synchronize time to server
+    shell: ntpdate {{ hostvars[groups['ntp-server'][0]].ipv4_address|default(hostvars[groups['ntp-server'][0]]['ansible_default_ipv4']['address']) }}
+    when: ansible_hostname in groups['ntp-clients']
+
+  - name: add cron task
+    cron: 
+      name: ntpdate 
+      job: "/usr/sbin/ntpdate {{ hostvars[groups['ntp-server'][0]].ipv4_address|default(hostvars[groups['ntp-server'][0]]['ansible_default_ipv4']['address']) }} >> /tmp/ntpdate.log 2>&1"
+      minute: "0"
+      hour: "1"
+

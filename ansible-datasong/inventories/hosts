@@ -45,6 +45,17 @@ node01
 node02
 node03
 
+[ntp-server]
+node01
+
+[ntp-clients]
+node02
+node03
+
+[ntp:children]
+ntp-server
+ntp-clients
+
 [hadoop:children]
 hadoop-namenodes
 hadoop-datanodes

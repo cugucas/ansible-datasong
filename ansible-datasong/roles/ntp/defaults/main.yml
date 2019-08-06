@@ -1,0 +1,3 @@
+ntp_install_path: /home/ntp
+ntp_user: root
+ntp_group: root
