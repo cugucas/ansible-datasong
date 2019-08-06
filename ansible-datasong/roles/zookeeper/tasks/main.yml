@@ -35,7 +35,7 @@
     dest: "{{ zookeeper_home }}/conf/zoo.cfg"
   tags: zookeeper_conf
 
-- name: modify hadoop configuration 
+- name: modify zookeeper configuration 
   template: 
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"

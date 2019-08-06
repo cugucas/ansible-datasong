@@ -24,9 +24,9 @@
 # into the startup scripts (bin/hbase, etc.)
 
 # The java implementation to use.  Java 1.7+ required.
-# export JAVA_HOME=/usr/java/jdk1.8.0_141
+export JAVA_HOME={{ java_home }}
 
-# export HBASE_MANAGES_ZK=false 
+export HBASE_MANAGES_ZK=false 
 
 # Extra Java CLASSPATH elements.  Optional.
 # export HBASE_CLASSPATH=

@@ -1,5 +1,7 @@
 hbase_version: 1.0.3
 hbase_tarball: hbase-{{ hbase_version }}.tar.gz
 hbase_install_path: /home/hbase
-hbase_home: /home/hbase-{{ hbase_version }}
+hbase_home: "{{ hbase_install_path }}/hbase-{{ hbase_version }}"
 hbase_heap: 4096
+hbase_user: root
+hbase_group: root

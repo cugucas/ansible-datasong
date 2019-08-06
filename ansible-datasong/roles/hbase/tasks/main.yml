@@ -1,27 +1,33 @@
 ---
 
-  - name: configure HBase 
-    template: 
-      src: "{{ item }}"
-      dest: "{{ hbase_home }}/conf/{{ item }}"
-      owner: root
-      group: root
-      mode: 0644
-    with_items:
-      - hbase-env.sh
-      - hbase-site.xml
-      - regionservers
-    notify:
-      - restart hbase-master
-      - restart hbase-regionserver
-    tags:
-      - hbase
-      - configuration
+  - name: mkdir for hbase home
+    file: 
+      dest: "{{ hbase_install_path }}"
+      mode: 0755
+      state: directory
+      owner: "{{ hbase_user }}" 
+      group: "{{ hbase_group }}"
 
-  - name: start namenode
+  - name: copy and unzip hbase.tar.gz to hosts
+    unarchive: 
+      src: "{{ hbase_tarball }}"
+      dest: "{{ hbase_install_path }}"
+
+  - name: modify hbase configuration  
+    template: 
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    with_items:
+      - { src: 'hbase-env.sh.j2', dest: '{{ hbase_home }}/conf/hbase-env.sh' }
+      - { src: 'hbase-site.xml.j2', dest: '{{ hbase_home }}/conf/hbase-site.xml' }
+      - { src: 'regionservers.j2', dest: '{{ hbase_home }}/conf/regionservers' }
+    tags: hbase_conf
+
+  - name: start hbase
     shell: sh {{ hbase_home }}/bin/start-hbase.sh
     become: true
     become_method: su
     become_user: root
+    when: ansible_hostname == groups['hbase-master'][0]
     tags:
-      - start hadoop
+      - start hbase
