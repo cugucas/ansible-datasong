@@ -1,38 +1,54 @@
-[ssh]
 node01 ansible_host=172.16.10.70
 node02 ansible_host=172.16.10.71
 node03 ansible_host=172.16.10.72
+
+[ssh]
+node01
+node02
+node03
 
 [hostname]
-node01 ansible_host=172.16.10.70
-node02 ansible_host=172.16.10.71
-node03 ansible_host=172.16.10.72
+node01
+node02
+node03
 
 [jdk]
-node01 ansible_host=172.16.10.70
-node02 ansible_host=172.16.10.71
-node03 ansible_host=172.16.10.72
+node01
+node02
+node03
 
 [elasticsearch] 
-node01 ansible_host=172.16.10.70 node_num=1 jvm_heap=2g
-node02 ansible_host=172.16.10.71 node_num=1 jvm_heap=2g
-node03 ansible_host=172.16.10.72 node_num=1 jvm_heap=2g
+node01 node_num=1 jvm_heap=2g
+node02 node_num=1 jvm_heap=2g
+node03 node_num=1 jvm_heap=2g
 
 [hbase-master]
-node01 ansible_host=172.16.10.70
+node01
 
 [hbase-regionserver]
-node02 ansible_host=172.16.10.71
-node03 ansible_host=172.16.10.72
+node02
+node03
 
-[hdfs-namenode]
-node01 ansible_host=172.16.10.70
+[hadoop-namenodes]
+node01
 
-[hdfs-datanode]
-node02 ansible_host=172.16.10.71
-node03 ansible_host=172.16.10.72
+[hadoop-datanodes]
+node02
+node03
+
+[hadoop-yarn]
+node01
 
 [zookeeper]
-node01 ansible_host=172.16.10.70
-node02 ansible_host=172.16.10.71
-node03 ansible_host=172.16.10.72
+node01
+node02
+node03
+
+[hadoop:children]
+hadoop-namenodes
+hadoop-datanodes
+hadoop-yarn
+
+[hbase:children]
+hbase-master
+hbase-regionserver

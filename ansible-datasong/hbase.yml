@@ -1,0 +1,7 @@
+---
+
+- name: hbase
+  hosts: hbase
+  remote_user: root
+  roles:
+    - hbase

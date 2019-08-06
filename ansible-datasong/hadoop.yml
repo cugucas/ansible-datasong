@@ -1,0 +1,7 @@
+---
+
+- name: hadoop
+  hosts: hadoop
+  remote_user: root
+  roles:
+    - hadoop

@@ -1,5 +1,5 @@
 hbase_version: 1.0.3
 hbase_tarball: hbase-{{ hbase_version }}.tar.gz
-hbase_install_path: /home/hadoop
-hbase_home: /home/hadoop/hbase-{{ hbase_version }}
+hbase_install_path: /home/hbase
+hbase_home: /home/hbase-{{ hbase_version }}
 hbase_heap: 4096

@@ -1,0 +1,13 @@
+hadoop_version: 2.6.0
+hadoop_tarball: hadoop-{{ hadoop_version }}.tar.gz
+hadoop_install_path: /home/hadoop
+hadoop_home: "{{ hadoop_install_path }}/hadoop-{{ hadoop_version }}"
+hadoop_heap: 4096
+hadoop_user: root
+hadoop_group: root
+cluster_name: datasong_hadoop
+dfs_namenode_name_dir: "{{ hadoop_home }}/dfs/name"
+dfs_datanode_data_dir: "{{ hadoop_home }}/dfs/data"
+dfs_replication: 3
+namenode_format: true
+namenode_standby: false

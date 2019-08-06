@@ -13,17 +13,40 @@
       src: "{{ zookeeper_tarball }}"
       dest: "{{ zookeeper_install_path }}"
 
+- name: mkdir for zookeeper data 
+  file: 
+    dest: "{{ zookeeper_data_dir }}"
+    mode: 0755
+    state: directory
+    owner: "{{ zookeeper_user }}" 
+    group: "{{ zookeeper_group }}"
+
+- name: mkdir for zookeeper log 
+  file: 
+    dest: "{{ zookeeper_log_dir }}"
+    mode: 0755
+    state: directory
+    owner: "{{ zookeeper_user }}" 
+    group: "{{ zookeeper_group }}"
+
 - name: modify zookeeper configuration 
   template: 
     src: "zoo.cfg.j2"
     dest: "{{ zookeeper_home }}/conf/zoo.cfg"
-  notify: 
-      - restart zookeeper
   tags: zookeeper_conf
 
-- name: install myid
+- name: modify hadoop configuration 
   template: 
-    src: myid.j2 
-    dest: "{{ zookeeper_data_dir }}/myid"
-  when: groups['zookeepernodes']|count > 1 and destroy_data
-  tags: init
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: 'myid.j2', dest: '{{ zookeeper_data_dir }}/myid' }
+    - { src: 'zoo.cfg.j2', dest: '{{ zookeeper_home }}/conf/zoo.cfg' }
+    - { src: 'zkEnv.sh.j2', dest: '{{ zookeeper_home }}/bin/zkEnv.sh' }
+  tags: zookeeper_conf
+
+- name: start zookeeper
+  shell: sh {{ zookeeper_home }}/bin/zkServer.sh start
+  become: true
+  become_method: su
+  become_user: root

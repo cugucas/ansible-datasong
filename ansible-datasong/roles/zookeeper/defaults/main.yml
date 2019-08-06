@@ -1,7 +1,8 @@
 zookeeper_version: 3.4.6
 zookeeper_tarball: zookeeper-{{ zookeeper_version }}.tar.gz
-zookeeper_install_path: "/home/hadoop"
-zookeeper_home: "/home/hadoop/zookeeper-{{ zookeeper_version }}"
+zookeeper_install_path: "/home/zookeeper"
+zookeeper_home: "{{ zookeeper_install_path }}/zookeeper-{{ zookeeper_version }}"
 zookeeper_data_dir: "{{ zookeeper_home }}/data"
+zookeeper_log_dir: "{{ zookeeper_home }}/logs"
 zookeeper_user: root
 zookeeper_group: root

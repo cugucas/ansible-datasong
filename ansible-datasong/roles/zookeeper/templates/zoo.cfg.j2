@@ -12,7 +12,7 @@ dataDir={{ zookeeper_data_dir }}
 # the port at which the clients will connect
 clientPort=2181
 # the directory where the transaction logs are stored.
-dataLogDir={{ zookeeper_data_dir }}
+dataLogDir={{ zookeeper_log_dir }}
 
 {% if groups['zookeeper']|count > 1 %}
 {% for item in groups['zookeeper'] %}
