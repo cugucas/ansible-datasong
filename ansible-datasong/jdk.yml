@@ -1,6 +1,0 @@
----
-- name: jdk
-  hosts: jdk
-  remote_user: root
-  roles:
-    - jdk

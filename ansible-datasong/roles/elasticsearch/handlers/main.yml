@@ -1,10 +1,30 @@
 ---
 
-- name: restart elasticsearch
-  shell: |
-    su - {{ elasticsearch_user }}
-    jps | grep Elasticsearch | awk '{print $1}' | xargs kill -9 
-    "{{ elasticsearch_home }}/bin/elasticsearch -d"
+- name: get elasticsearch pid
+  listen: 
+    - restart elasticsearch
+    - stop elasticsearch
+  shell: 
+    "ps -ef | grep -v grep | grep -w Elasticsearch | awk '{print $2}'"
+  register: running_processes
+
+- name: kill running elasticsearch processes
+  listen: 
+    - restart elasticsearch
+    - stop elasticsearch
+  ignore_errors: true
+  shell: "kill {{ item }}"
+  with_items: "{{ running_processes.stdout_lines }}"
+
+- name: start new elasticsearch processes
+  listen: 
+    - restart elasticsearch
+    - start elasticsearch
+
+  shell: "su - {{ elasticsearch_user }} -c '{{ elasticsearch_home }}/bin/elasticsearch -d'"
+
+
+    #"{{ elasticsearch_home }}/bin/elasticsearch -d"
 
     #su - {{ elasticsearch_user }} -c 'kill -9 `jps | grep "Elasticsearch" | cut -d " " -f 1`'
     #su - {{ elasticsearch_user }} -c '{{ elasticsearch_home }}/bin/elasticsearch -d'

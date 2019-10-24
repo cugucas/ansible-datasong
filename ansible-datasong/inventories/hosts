@@ -1,27 +1,16 @@
 [all]
-node01 ansible_host=172.16.10.70
-node02 ansible_host=172.16.10.71
-node03 ansible_host=172.16.10.72
-
-[ssh]
-node01
-node02
-node03
-
-[hostname]
-node01
-node02
-node03
-
-[jdk]
-node01
-node02
-node03
+node01 ansible_host=172.16.10.30
+node02 ansible_host=172.16.10.31
+node03 ansible_host=172.16.10.32
+node04 ansible_host=172.16.10.33
+node05 ansible_host=172.16.10.34
 
 [elasticsearch] 
 node01 node_num=1 jvm_heap=2g
 node02 node_num=1 jvm_heap=2g
 node03 node_num=1 jvm_heap=2g
+node04 node_num=1 jvm_heap=2g
+node05 node_num=1 jvm_heap=2g
 
 [hbase-master]
 node01
@@ -29,6 +18,8 @@ node01
 [hbase-regionservers]
 node02
 node03
+node04
+node05
 
 [hadoop-namenodes]
 node01
@@ -36,9 +27,22 @@ node01
 [hadoop-datanodes]
 node02
 node03
+node04
+node05
+
 
 [hadoop-yarn]
 node01
+
+[rocketmq-nameservers]
+node01
+node02
+
+[rocketmq-brokers]
+node03 broker_name="broker01" broker_id=0 broker_role=SYNC_MASTER
+node04 broker_name="broker01" broker_id=1 broker_role=SLAVE
+node05 broker_name="broker01" broker_id=0 broker_role=SYNC_MASTER
+
 
 [zookeeper]
 node01
@@ -51,6 +55,9 @@ node01
 [ntp-clients]
 node02
 node03
+node04
+node05
+
 
 [ntp:children]
 ntp-server
@@ -64,3 +71,7 @@ hadoop-yarn
 [hbase:children]
 hbase-master
 hbase-regionservers
+
+[rocketmq:children]
+rocketmq-nameservers
+rocketmq-brokers

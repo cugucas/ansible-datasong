@@ -1,0 +1,33 @@
+---
+
+- name: stop nameservers 
+  listen: 
+    - stop namesrv
+  shell: "{{ rocketmq_home }}/bin/mqshutdown namesrv"
+  register: namesrv_command_result
+  failed_when: "'Failed' in namesrv_command_result.stderr"
+
+- name: start new namesrv processes
+  listen: 
+    - start namesrv
+  shell: "nohup sh {{ rocketmq_home }}/bin/mqnamesrv &" 
+  become: true
+  become_method: su
+  become_user: root
+
+
+- name: stop brokers
+  listen: 
+    - stop broker
+  shell: "{{ rocketmq_home }}/bin/mqshutdown broker"
+  register: broker_command_result
+  failed_when: "'Failed' in broker_command_result.stderr"
+
+
+- name: start new broker processes
+  listen: 
+    - start broker
+  shell: "nohup sh {{ rocketmq_home }}/bin/mqbroker -c {{ rocketmq_home }}/conf/broker.conf autoCreateTopicEnable=true &"
+  become: true
+  become_method: su
+  become_user: root

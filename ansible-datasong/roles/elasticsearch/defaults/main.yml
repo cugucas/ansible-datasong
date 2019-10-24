@@ -2,5 +2,6 @@ elasticsearch_version: 6.1.3
 elasticsearch_tarball: elasticsearch-{{ elasticsearch_version }}.tar.gz
 elasticsearch_install_path: /home/es
 elasticsearch_home: /home/es/elasticsearch-{{ elasticsearch_version }}
+elasticsearch_heap_size: 32G
 elasticsearch_user: es
 elasticsearch_group: es

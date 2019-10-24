@@ -1,0 +1,99 @@
+---
+
+- name: mkdir for rocketmq home
+  file: 
+    dest: "{{ rocketmq_install_path }}"
+    mode: 0755
+    state: directory
+    owner: "{{ rocketmq_user }}" 
+    group: "{{ rocketmq_group }}"
+  tags:
+    - install
+
+
+- name: copy and unzip rocketmq.tar.gz to hosts
+  unarchive: 
+    src: "{{ rocketmq_tarball }}"
+    dest: "{{ rocketmq_install_path }}"
+  tags:
+    - install
+
+- name: modify runserver and runbroker configuration  
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: 'runserver.sh.j2', dest: '{{ rocketmq_home }}/bin/runserver.sh' }
+    - { src: 'runbroker.sh.j2', dest: '{{ rocketmq_home }}/bin/runbroker.sh' }
+  when: ansible_hostname in groups['rocketmq']
+  tags:
+    - install
+    - configure
+
+- name: modify broker configuration  
+  template: 
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - { src: 'broker.conf.j2', dest: '{{ rocketmq_home }}/conf/broker.conf' }
+  when: ansible_hostname in groups['rocketmq-brokers']
+  tags:
+    - install
+    - configure
+
+
+- name: change shell sbin file
+  file: 
+    dest: "{{ rocketmq_home }}/bin"
+    mode: 0755 
+    recurse: yes
+  tags:
+    - install
+
+
+- name: stop nameservers
+  shell: ls
+  notify: 
+    - stop namesrv
+  when: ansible_hostname in groups['rocketmq-nameservers']
+  tags: 
+    - stop namesrv
+    - stop
+    - restart namesrv
+    - restart
+
+- name: stop brokers
+  shell: ls
+  notify: 
+    - stop broker
+  when: ansible_hostname in groups['rocketmq-brokers']
+  tags: 
+    - stop broker
+    - stop
+    - restart broker
+    - restart
+
+- name: start nameservers
+  shell: ls
+  notify: 
+    - start namesrv
+  when: ansible_hostname in groups['rocketmq-nameservers']
+  tags: 
+    - start namesrv
+    - start
+    - restart namesrv
+    - restart
+
+- name: start brokers
+  shell: ls
+  notify: 
+    - start broker
+  when: ansible_hostname in groups['rocketmq-brokers']
+  tags: 
+    - start broker
+    - start
+    - restart broker
+    - restart
+
+
+

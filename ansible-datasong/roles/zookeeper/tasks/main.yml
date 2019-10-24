@@ -7,11 +7,17 @@
     state: directory
     owner: "{{ zookeeper_user }}" 
     group: "{{ zookeeper_group }}"
+  tags:
+    - install
+
     
 - name: copy and unzip zookeeper.tar.gz to hosts
   unarchive: 
       src: "{{ zookeeper_tarball }}"
       dest: "{{ zookeeper_install_path }}"
+  tags:
+    - install
+
 
 - name: mkdir for zookeeper data 
   file: 
@@ -20,6 +26,9 @@
     state: directory
     owner: "{{ zookeeper_user }}" 
     group: "{{ zookeeper_group }}"
+  tags:
+    - install
+
 
 - name: mkdir for zookeeper log 
   file: 
@@ -28,12 +37,17 @@
     state: directory
     owner: "{{ zookeeper_user }}" 
     group: "{{ zookeeper_group }}"
+  tags:
+    - install
+
 
 - name: modify zookeeper configuration 
   template: 
     src: "zoo.cfg.j2"
     dest: "{{ zookeeper_home }}/conf/zoo.cfg"
-  tags: zookeeper_conf
+  tags: 
+    - install
+    - configure
 
 - name: modify zookeeper configuration 
   template: 
@@ -43,10 +57,36 @@
     - { src: 'myid.j2', dest: '{{ zookeeper_data_dir }}/myid' }
     - { src: 'zoo.cfg.j2', dest: '{{ zookeeper_home }}/conf/zoo.cfg' }
     - { src: 'zkEnv.sh.j2', dest: '{{ zookeeper_home }}/bin/zkEnv.sh' }
-  tags: zookeeper_conf
+  tags: 
+    - install
+    - configure
+
+- name: change owner and group
+  file: 
+    path: "{{ zookeeper_home }}"
+    owner: "{{ zookeeper_user }}"
+    group: "{{ zookeeper_group }}"
+    recurse: yes
+  tags:
+    - install
+
+
+- name: stop zookeeper
+  shell: sh {{ zookeeper_home }}/bin/zkServer.sh stop
+  become: true
+  become_method: su
+  become_user: root
+  tags:
+    - stop 
+    - restart
+    - install
 
 - name: start zookeeper
   shell: sh {{ zookeeper_home }}/bin/zkServer.sh start
   become: true
   become_method: su
   become_user: root
+  tags:
+    - start 
+    - restart
+    - install

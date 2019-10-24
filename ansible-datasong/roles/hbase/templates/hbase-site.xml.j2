@@ -6,7 +6,7 @@
 <configuration>
     <property>
         <name>hbase.rootdir</name>
-        <value>hdfs://{{ groups['hbase-master'][0] }}:9000/hbase</value>
+        <value>hdfs://{{ groups['hadoop-namenodes'][0] }}:9000/hbase</value>
     </property>
 
     <property>

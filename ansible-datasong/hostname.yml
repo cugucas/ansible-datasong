@@ -1,6 +1,0 @@
----
-- name: configure hostname
-  hosts: hostname
-  remote_user: root
-  roles:
-    - hostname

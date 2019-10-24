@@ -4,5 +4,6 @@ zookeeper_install_path: "/home/zookeeper"
 zookeeper_home: "{{ zookeeper_install_path }}/zookeeper-{{ zookeeper_version }}"
 zookeeper_data_dir: "{{ zookeeper_home }}/data"
 zookeeper_log_dir: "{{ zookeeper_home }}/logs"
+zookeeper_heap_size: 1024m
 zookeeper_user: root
 zookeeper_group: root

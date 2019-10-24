@@ -3,13 +3,18 @@
 - name: groupadd es
   group: 
       name: "{{ elasticsearch_group }}"
-      gid: "1000"
+      gid: "9200"
+  tags:
+    - install
 
 - name: useradd es
   user:
     name: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
     createhome: yes
+  tags:
+    - install
+
 
 - name: mkdir for elasticsearch home
   file: 
@@ -18,11 +23,16 @@
     state: directory
     owner: "{{ elasticsearch_user }}" 
     group: "{{ elasticsearch_group }}"
+  tags:
+    - install
+
     
 - name: copy and unzip elasticsearch.tar.gz to hosts
   unarchive: 
       src: "{{ elasticsearch_tarball }}"
       dest: "{{ elasticsearch_install_path }}"
+  tags:
+    - install
 
 
 - name: modify elasticsearch configuration 
@@ -32,9 +42,10 @@
   with_items:
       - { src: 'elasticsearch.yml.j2', dest: '{{ elasticsearch_home }}/config/elasticsearch.yml' }
       - { src: 'jvm.options.j2', dest: '{{ elasticsearch_home }}/config/jvm.options' } 
-  notify: 
-      - restart elasticsearch
-  tags: es_conf
+  tags: 
+    - configure
+    - install
+   
 
 - name: mkdir dir for logs data
   file: 
@@ -43,6 +54,9 @@
     state: directory
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
+  tags:
+    - install
+
 
 - name: change owner and group
   file: 
@@ -50,12 +64,37 @@
     owner: "{{ elasticsearch_user }}"
     group: "{{ elasticsearch_group }}"
     recurse: yes
-
-- name: make elasticsearch permission
-  shell: su - {{ elasticsearch_user }}  -c 'chmod +x {{ elasticsearch_home }}/bin/*'
-
-- name: start es
-  remote_user: root
-  shell: su - {{ elasticsearch_user }}  -c '{{ elasticsearch_home }}/bin/elasticsearch -d'
   tags:
+    - install
+
+
+- name: restart elasticsearch
+  #  shell: su - {{ elasticsearch_user }}  -c 'chmod +x {{ elasticsearch_home }}/bin/*'
+  shell: ls
+  notify: 
+    - restart elasticsearch
+  tags: 
+    - install
+    - restart
+
+- name: stop elasticsearch
+  shell: ls
+  notify: 
+    - stop elasticsearch
+  tags: 
+    - stop
+
+- name: start elasticsearch
+  shell: ls
+  notify: 
     - start elasticsearch
+  tags: 
+    - start
+
+
+
+#- name: start es
+#  remote_user: root
+#  shell: su - {{ elasticsearch_user }}  -c '{{ elasticsearch_home }}/bin/elasticsearch -d'
+#  tags:
+#    - start elasticsearch

@@ -1,0 +1,171 @@
+---
+
+#----------设置主机名开始----------#
+  # 把所有主机加入/etc/hosts文件
+  - name: (hostname) add ip address of all hosts to all hosts
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ hostvars[item].ansible_host }} {{item}}"
+      state: present
+    when: hostvars[item].ansible_host is defined
+    with_items: "{{ groups.all }}"
+    tags: hostname
+
+  # 设置本机hostname
+  - name: (hostname) set hostname
+    shell: hostnamectl set-hostname {{ ansible_hostname }}
+    tags: hostname
+#----------设置主机名结束---------#
+
+#----------关闭防火墙开始----------#
+  # 关闭防火墙
+  - name: (firewall) stop and disable firewalld
+    service:
+       name: firewalld
+       state: stopped
+       enabled: False
+    tags: firewall
+
+  # 重启网络服务
+  - name: (firewall) restart network service
+    shell: systemctl restart network
+    tags: firewall
+#----------关闭防火墙结束----------#
+
+  # 关闭SELinux，需要重启后生效
+  - name: (selinux) disable selinux
+    selinux: 
+      state: disabled
+    tags: selinux
+
+#----------设置SSH免密登录开始----------#
+
+  # 使profile生效
+  - name: (ssh) enforce env
+    shell: source /etc/profile
+    run_once: true
+    tags: ssh
+
+  # 关闭初次访问提示询问
+  - name: (ssh) close ssh check.    
+    shell: sed -i "s/^.*StrictHostKeyChecking.*$/   StrictHostKeyChecking no/g" /etc/ssh/ssh_config
+    tags: ssh
+
+  # 删除.ssh文件，保持最新
+  - name: (ssh) delete /root/.ssh/
+    shell: rm -rf /root/.ssh/
+    tags: ssh
+
+  # 生成公钥和私钥
+  - name: (ssh) generating public/private rsa key pair  
+    shell: ssh-keygen -t rsa -b 2048 -N '' -f /root/.ssh/id_rsa
+    tags: ssh
+
+  # 将公钥设置成变量
+  - name: (ssh) view id_rsa.pub  
+    shell: cat /root/.ssh/id_rsa.pub
+    register: sshinfo
+  - set_fact: 
+      sshpub: "{{ sshinfo.stdout }}"
+    tags: ssh
+
+  # 合并各个节点公钥
+  - name: (ssh) add ssh record 
+    local_action: shell echo "{{ sshpub }}" >> "{{ role_path }}/templates/authorized_keys.j2"
+    tags: ssh
+
+  # 分发到各个节点上
+  - name: (ssh) copy authorized_keys.j2 to all 
+    template: 
+      src: "authorized_keys.j2"
+      dest: "/root/.ssh/authorized_keys"
+      mode: 0600
+    tags: ssh
+#----------设置SSH免密登录结束----------#
+
+#----------安装JDK开始----------#
+  # 创建JDK安装目录
+  - name: (jdk) mkdir jdk directory  
+    file: 
+      path: "{{ jdk_install_path }}"
+      state: directory
+      mode: 0755
+    tags: jdk
+
+  # 解压并复制tar.gz到安装目录下
+  - name: (jdk) copy and unzip jdk 
+    unarchive: 
+      src: "{{ jdk_file }}"
+      dest: "{{ jdk_install_path }}"
+    tags: jdk
+
+  # 设置JAVA_HOME
+  - name: (jdk) set env 
+    lineinfile: 
+      dest: /etc/profile 
+      insertafter: "{{item.position}}" 
+      line: "{{item.value}}"
+      state: present
+    with_items:
+    - {position: EOF, value: "export JAVA_HOME={{ jdk_install_path }}/{{ jdk_install_folder }}"}
+    - {position: EOF, value: "export PATH=$JAVA_HOME/bin:$PATH"}
+    tags: jdk
+
+  # 修改执行权限
+  - name: (jdk) chmod bin  
+    file: 
+      dest: "{{ jdk_install_path }}/{{ jdk_install_folder }}/bin"
+      mode: 0755
+      recurse: yes
+    tags: jdk
+       
+  # 使JAVA_HOME生效
+  - name: (jdk) enforce env  
+    shell: source /etc/profile
+    tags: jdk
+#----------安装JDK结束---------#
+
+#----------配置系统变量开始---------#
+  # 修改最大文件打开数
+  - name: (sysconfig) check if ulimit file numbers
+    shell: cat /etc/security/limits.conf
+    register: ulimit_result 
+    tags: sysconfig
+
+  # 修改最大文件打开数
+  - name: (sysconfig) ulimit file numbers 
+    pam_limits:
+      domain: '*'
+      limit_type: hard
+      limit_item: nofile
+      value: 655360
+    tags: sysconfig
+
+  # 修改最大文件打开数
+  - name: (sysconfig) ulimit file numbers 
+    pam_limits:
+      domain: '*'
+      limit_type: soft
+      limit_item: nofile
+      value: 655360
+    tags: sysconfig
+
+  # 修改虚拟内存数
+  - sysctl:
+      name: vm.max_map_count
+      value: 262144
+      state: present
+    tags: sysconfig
+
+  # 修改虚拟内存数
+  - name: (sysconfig) set vm.max_map_count
+    shell: sysctl -w vm.max_map_count=262144
+    tags: sysconfig
+#----------配置系统变量结束---------#
+
+  # 重启服务器
+  - name: (restart) reboot servers
+    shell: reboot now
+    tags: restart
+

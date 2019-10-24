@@ -1,0 +1,8 @@
+rocketmq_version: 4.4.0
+rocketmq_tarball: rocketmq-{{ rocketmq_version }}.tar.gz
+rocketmq_install_path: /home/rocketmq
+rocketmq_home: "{{ rocketmq_install_path }}/rocketmq-{{ rocketmq_version }}"
+rocketmq_namesrv_heap_size: 1024m
+rockermq_broker_heap_size: 1024m
+rocketmq_user: root
+rocketmq_group: root

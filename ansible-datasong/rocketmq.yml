@@ -1,0 +1,7 @@
+---
+
+- name: rocketmq
+  hosts: rocketmq
+  remote_user: root
+  roles:
+    - rocketmq
